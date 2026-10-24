@@ -9,8 +9,21 @@ const EXCHANGE = "catalog";
 app.use(express.json());
 
 // ── Materialized store ──────────────────────────────────────────────────────
-type Product = { id: number; name: string; price: number; category: string; rating: number; image: string };
-type Review  = { id: number; productId: number; author: string; rating: number; comment: string };
+type Product = {
+  id: number;
+  name: string;
+  price: number;
+  category: string;
+  rating: number;
+  image: string;
+};
+type Review = {
+  id: number;
+  productId: number;
+  author: string;
+  rating: number;
+  comment: string;
+};
 type MaterializedProduct = Product & { reviews: Review[] };
 
 const store = new Map<number, MaterializedProduct>();
@@ -35,7 +48,9 @@ async function start() {
   await channel.assertExchange(EXCHANGE, "topic", { durable: true });
 
   // Assert queue and bindings BEFORE requesting sync
-  const { queue } = await channel.assertQueue("search-service.catalog", { durable: true });
+  const { queue } = await channel.assertQueue("search-service.catalog", {
+    durable: true,
+  });
   await channel.bindQueue(queue, EXCHANGE, "product.updated");
   await channel.bindQueue(queue, EXCHANGE, "review.updated");
 
@@ -44,24 +59,39 @@ async function start() {
     const routingKey = msg.fields.routingKey;
     const payload = JSON.parse(msg.content.toString());
     if (routingKey === "product.updated") upsertProduct(payload as Product);
-    if (routingKey === "review.updated")  upsertReview(payload as Review);
+    if (routingKey === "review.updated") upsertReview(payload as Review);
     channel.ack(msg);
   });
 
   // Request full sync — products and review services will publish all their data
-  channel.publish(EXCHANGE, "catalog.sync", Buffer.from("{}"), { persistent: false });
-  console.log("search-service requested catalog.sync, building materialized store...");
+  channel.publish(EXCHANGE, "catalog.sync", Buffer.from("{}"), {
+    persistent: false,
+  });
+  console.log(
+    "search-service requested catalog.sync, building materialized store...",
+  );
 
   // ── HTTP ──────────────────────────────────────────────────────────────────
   app.get("/", (req, res) => {
     const query = ((req.query.q as string) ?? "").toLowerCase();
 
-    const results = [...store.values()].filter((p) =>
-      p.name.toLowerCase().includes(query) ||
-      p.category.toLowerCase().includes(query)
+    const results = [...store.values()].filter(
+      (p) =>
+        p.name.toLowerCase().includes(query) ||
+        p.category.toLowerCase().includes(query),
     );
 
     res.json({ query, total: results.length, products: results });
+  });
+
+  app.post("/", (req, res) => {
+
+
+    const productId = Number(req.body.productId) ;
+
+    const result = [...store.values()].find((p) => p.id === productId);
+
+    res.json({ product: result });
   });
 
   app.get("/health", (_req, res) => {
