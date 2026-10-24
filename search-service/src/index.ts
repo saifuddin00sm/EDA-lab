@@ -1,80 +1,71 @@
 import express from "express";
 import amqplib from "amqplib";
-import { randomUUID } from "crypto";
 
 const app = express();
 const PORT = 3004;
 const RABBITMQ_URL = "amqp://localhost";
+const EXCHANGE = "catalog";
 
 app.use(express.json());
 
-let channel: amqplib.Channel;
-// correlationId → { resolve, timer }
-const pendingRequests = new Map<string, { resolve: (val: unknown) => void; timer: ReturnType<typeof setTimeout> }>();
+// ── Materialized store ──────────────────────────────────────────────────────
+type Product = { id: number; name: string; price: number; category: string; rating: number; image: string };
+type Review  = { id: number; productId: number; author: string; rating: number; comment: string };
+type MaterializedProduct = Product & { reviews: Review[] };
 
-async function connectRabbitMQ() {
+const store = new Map<number, MaterializedProduct>();
+
+function upsertProduct(product: Product) {
+  const existing = store.get(product.id);
+  store.set(product.id, { ...product, reviews: existing?.reviews ?? [] });
+}
+
+function upsertReview(review: Review) {
+  const product = store.get(review.productId);
+  if (!product) return;
+  const reviews = product.reviews.filter((r) => r.id !== review.id);
+  store.set(review.productId, { ...product, reviews: [...reviews, review] });
+}
+// ───────────────────────────────────────────────────────────────────────────
+
+async function start() {
   const connection = await amqplib.connect(RABBITMQ_URL);
-  channel = await connection.createChannel();
+  const channel = await connection.createChannel();
 
-  await channel.assertQueue("search.products", { durable: false });
-  await channel.assertQueue("search.reviews", { durable: false });
+  await channel.assertExchange(EXCHANGE, "topic", { durable: true });
 
-  // Exclusive reply queue for this service instance
-  const { queue: replyQueue } = await channel.assertQueue("", { exclusive: true });
+  // Assert queue and bindings BEFORE requesting sync
+  const { queue } = await channel.assertQueue("search-service.catalog", { durable: true });
+  await channel.bindQueue(queue, EXCHANGE, "product.updated");
+  await channel.bindQueue(queue, EXCHANGE, "review.updated");
 
-  channel.consume(replyQueue, (msg) => {
+  channel.consume(queue, (msg) => {
     if (!msg) return;
-    const correlationId = msg.properties.correlationId as string;
-    const pending = pendingRequests.get(correlationId);
-    if (pending) {
-      clearTimeout(pending.timer);
-      pendingRequests.delete(correlationId);
-      pending.resolve(JSON.parse(msg.content.toString()));
-    }
-  }, { noAck: true });
-
-  console.log("search-service connected to RabbitMQ");
-  return replyQueue;
-}
-
-function requestReply(queue: string, payload: unknown, replyQueue: string): Promise<unknown> {
-  return new Promise((resolve, reject) => {
-    const correlationId = randomUUID();
-    const timer = setTimeout(() => {
-      pendingRequests.delete(correlationId);
-      reject(new Error(`Timeout waiting for reply from ${queue}`));
-    }, 5000);
-
-    pendingRequests.set(correlationId, { resolve, timer });
-
-    channel.sendToQueue(queue, Buffer.from(JSON.stringify(payload)), {
-      correlationId,
-      replyTo: replyQueue,
-    });
+    const routingKey = msg.fields.routingKey;
+    const payload = JSON.parse(msg.content.toString());
+    if (routingKey === "product.updated") upsertProduct(payload as Product);
+    if (routingKey === "review.updated")  upsertReview(payload as Review);
+    channel.ack(msg);
   });
-}
 
-async function startServer() {
-  const replyQueue = await connectRabbitMQ();
+  // Request full sync — products and review services will publish all their data
+  channel.publish(EXCHANGE, "catalog.sync", Buffer.from("{}"), { persistent: false });
+  console.log("search-service requested catalog.sync, building materialized store...");
 
-  app.get("/", async (req, res) => {
-    const query = (req.query.q as string) ?? "";
+  // ── HTTP ──────────────────────────────────────────────────────────────────
+  app.get("/", (req, res) => {
+    const query = ((req.query.q as string) ?? "").toLowerCase();
 
-    try {
-      const [products, reviews] = await Promise.all([
-        requestReply("search.products", { query }, replyQueue),
-        requestReply("search.reviews", { query }, replyQueue),
-      ]);
+    const results = [...store.values()].filter((p) =>
+      p.name.toLowerCase().includes(query) ||
+      p.category.toLowerCase().includes(query)
+    );
 
-      res.json({ query, products, reviews });
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Search failed";
-      res.status(504).json({ error: message });
-    }
+    res.json({ query, total: results.length, products: results });
   });
 
   app.get("/health", (_req, res) => {
-    res.json({ service: "search-service", status: "ok" });
+    res.json({ service: "search-service", status: "ok", indexed: store.size });
   });
 
   app.listen(PORT, () => {
@@ -82,4 +73,4 @@ async function startServer() {
   });
 }
 
-startServer();
+start();
