@@ -4,71 +4,111 @@ export const products = [
     name: "Wireless Headphones",
     price: 79.99,
     category: "Electronics",
-    image:
-      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=500&fit=crop",
     rating: 4.5,
+    description: "Premium over-ear wireless headphones with active noise cancellation, 30-hour battery life, and foldable design. Bluetooth 5.0 ensures a stable connection up to 10 meters.",
+    reviews: [
+      { id: 1, author: "Alex M.", rating: 5, date: "2024-11-10", comment: "Incredible sound quality and the noise cancellation is top-notch. Best headphones I've owned." },
+      { id: 2, author: "Sarah K.", rating: 4, date: "2024-10-22", comment: "Very comfortable for long sessions. Battery life is exactly as advertised." },
+      { id: 3, author: "James R.", rating: 4, date: "2024-09-15", comment: "Great value for the price. The foldable design makes it easy to carry around." },
+    ],
   },
   {
     id: 2,
     name: "Running Sneakers",
     price: 119.99,
     category: "Footwear",
-    image:
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=500&fit=crop",
     rating: 4.3,
+    description: "Lightweight and responsive running shoes with breathable mesh upper and cushioned midsole. Designed for road running with superior grip and durability.",
+    reviews: [
+      { id: 1, author: "Chris P.", rating: 5, date: "2024-11-05", comment: "These are the most comfortable running shoes I've ever worn. My knees thank me." },
+      { id: 2, author: "Nina W.", rating: 4, date: "2024-10-18", comment: "Great grip and very lightweight. Runs slightly large so size down half a size." },
+      { id: 3, author: "Tom H.", rating: 3, date: "2024-09-30", comment: "Good shoes but the sole started peeling after 3 months of heavy use." },
+    ],
   },
   {
     id: 3,
     name: "Leather Backpack",
     price: 89.99,
     category: "Bags",
-    image:
-      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&h=500&fit=crop",
     rating: 4.7,
+    description: "Handcrafted genuine leather backpack with a 20L capacity, padded laptop compartment (fits up to 15\"), and multiple organizer pockets. Ages beautifully over time.",
+    reviews: [
+      { id: 1, author: "Emma L.", rating: 5, date: "2024-11-12", comment: "Absolutely stunning bag. The leather quality is exceptional and it fits my 15\" laptop perfectly." },
+      { id: 2, author: "David C.", rating: 5, date: "2024-10-25", comment: "Worth every penny. I get compliments on this bag everywhere I go." },
+      { id: 3, author: "Priya S.", rating: 4, date: "2024-09-08", comment: "Beautiful craftsmanship. Took a week to break in but now it's incredibly comfortable." },
+    ],
   },
   {
     id: 4,
     name: "Mechanical Keyboard",
     price: 149.99,
     category: "Electronics",
-    image:
-      "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&h=500&fit=crop",
     rating: 4.6,
+    description: "Tenkeyless mechanical keyboard with Cherry MX Brown switches, per-key RGB backlighting, and a durable aluminum frame. Compatible with Windows and macOS.",
+    reviews: [
+      { id: 1, author: "Ryan T.", rating: 5, date: "2024-11-08", comment: "The tactile feedback is perfect. My typing speed has noticeably improved." },
+      { id: 2, author: "Mia F.", rating: 4, date: "2024-10-14", comment: "Solid build quality and the RGB is gorgeous. The software could be better though." },
+      { id: 3, author: "Leo B.", rating: 5, date: "2024-09-20", comment: "Best keyboard I've used. The aluminum frame feels premium and the switches are satisfying." },
+    ],
   },
   {
     id: 5,
     name: "Sunglasses",
     price: 59.99,
     category: "Accessories",
-    image:
-      "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600&h=500&fit=crop",
     rating: 4.2,
+    description: "Polarized UV400 sunglasses with a lightweight titanium frame. Reduces glare and provides full UV protection. Comes with a hard case and cleaning cloth.",
+    reviews: [
+      { id: 1, author: "Olivia N.", rating: 4, date: "2024-11-01", comment: "Stylish and the polarization really works. Very lightweight on the face." },
+      { id: 2, author: "Ben A.", rating: 4, date: "2024-10-10", comment: "Great quality for the price. The case is a nice bonus." },
+      { id: 3, author: "Zoe M.", rating: 4, date: "2024-09-05", comment: "Love the design. Fits my face shape perfectly and blocks glare effectively." },
+    ],
   },
   {
     id: 6,
     name: "Smart Watch",
     price: 199.99,
     category: "Electronics",
-    image:
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&h=500&fit=crop",
     rating: 4.8,
+    description: "Feature-packed smartwatch with health monitoring (heart rate, SpO2, sleep tracking), GPS, 5-day battery life, and 50m water resistance. Works with iOS and Android.",
+    reviews: [
+      { id: 1, author: "Hannah G.", rating: 5, date: "2024-11-15", comment: "The health tracking is incredibly accurate. Sleep tracking has been a game changer for me." },
+      { id: 2, author: "Mark D.", rating: 5, date: "2024-10-28", comment: "Battery life is amazing. I charge it once a week. The GPS is spot on." },
+      { id: 3, author: "Lily C.", rating: 4, date: "2024-09-22", comment: "Excellent watch. The only minor issue is the app could use some polish." },
+    ],
   },
   {
     id: 7,
     name: "Yoga Mat",
     price: 39.99,
     category: "Sports",
-    image:
-      "https://images.unsplash.com/photo-1601925228008-f5e4c5e5b8e4?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1601925228008-f5e4c5e5b8e4?w=600&h=500&fit=crop",
     rating: 4.4,
+    description: "Eco-friendly non-slip yoga mat made from natural rubber. 6mm thick for joint support, with alignment lines and a carrying strap. Suitable for all yoga styles.",
+    reviews: [
+      { id: 1, author: "Sophie R.", rating: 5, date: "2024-11-03", comment: "The grip is fantastic even when sweaty. The thickness is perfect for my knees." },
+      { id: 2, author: "Jake W.", rating: 4, date: "2024-10-16", comment: "Great mat for the price. The alignment lines are really helpful for beginners." },
+      { id: 3, author: "Ava T.", rating: 4, date: "2024-09-12", comment: "Durable and easy to clean. The carrying strap is a nice touch." },
+    ],
   },
   {
     id: 8,
     name: "Coffee Maker",
     price: 69.99,
     category: "Kitchen",
-    image:
-      "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&h=500&fit=crop",
     rating: 4.1,
+    description: "12-cup programmable drip coffee maker with a built-in grinder, brew strength control, and a thermal carafe to keep coffee hot for hours. Auto-shutoff included.",
+    reviews: [
+      { id: 1, author: "Carlos V.", rating: 4, date: "2024-11-07", comment: "Makes great coffee and the built-in grinder is super convenient. Easy to clean." },
+      { id: 2, author: "Diana F.", rating: 4, date: "2024-10-20", comment: "The thermal carafe keeps coffee hot all morning. Very happy with this purchase." },
+      { id: 3, author: "Sam K.", rating: 4, date: "2024-09-18", comment: "Solid coffee maker. The programmable timer means I wake up to fresh coffee every day." },
+    ],
   },
 ];

@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar";
 import Products from "./pages/Products";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
+import ProductDetail from "./pages/ProductDetail";
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
         <main className="container">
           <Routes>
             <Route path="/" element={<Products />} />
+            <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<Checkout />} />
           </Routes>
